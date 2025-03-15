@@ -4,10 +4,10 @@ Add aplit expensees among friends and groups at ease/ Track spending over months
 
 ### How to run
 
--> Intall golang
--> get all the dependencies `go mod tidy`
--> Get the db ready `docker-compose up -d`
--> run backend `cd ./backend` and `go run ./cmd/main.go`
+-> Intall golang <br>
+-> get all the dependencies `go mod tidy` <br>
+-> Get the db ready `docker-compose up -d` <br>
+-> run backend `cd ./backend` and `go run ./cmd/main.go` <br>
 
 ### Schema Design MongoDb
 
