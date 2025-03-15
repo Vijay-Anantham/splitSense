@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"log"
+	userhandler "splisense/services/userHandler"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,6 +22,11 @@ func NewApiServer(addr string, db *sql.DB) *ApiServer {
 
 func (s *ApiServer) Run() error {
 	router := gin.Default()
+
+	v1 := router.Group("/v1")
+
+	userService := userhandler.NewHandler()
+	userService.RegisterRouts(v1)
 
 	log.Println("Listening on", s.addr)
 
