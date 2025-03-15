@@ -1,20 +1,50 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"splisense/cmd/api"
-	"splisense/common/config"
+	"splisense/common/configs"
+	"splisense/common/db"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 func main() {
-	// initi basic server config
-	configs := config.InitConfig()
+
+	cfg := mysql.Config{
+		User:                 configs.Envs.DBUser,
+		Passwd:               configs.Envs.DBPassword,
+		Addr:                 configs.Envs.DBAddress,
+		DBName:               configs.Envs.DBName,
+		Net:                  "tcp",
+		AllowNativePasswords: true,
+		ParseTime:            true,
+	}
 
 	// Initialize DB connection
+	db, err := db.NewMySQLStorage(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	server := api.NewApiServer(fmt.Sprintf(":%s", configs.Port), db)
+	initStorage(db)
+
+	// Run server
+	server := api.NewApiServer(fmt.Sprintf(":%s", configs.Envs.Port), db)
+	if err := server.Run(); err != nil {
+		log.Fatal(err)
+	}
 }
 
-func CheckDBConn(db) {
+// Check db connection before passing it to server
 
+func initStorage(db *sql.DB) {
+	err := db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("DB: Successfully connected!")
 }
