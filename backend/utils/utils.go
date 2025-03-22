@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -39,4 +40,18 @@ func GetTokenFromRequest(c *gin.Context) string {
 	}
 
 	return ""
+}
+
+func ParseIntParam(c *gin.Context, param string) (int, error) {
+	str := c.Param(param)
+	if str == "" {
+		return 0, fmt.Errorf("missing %s parameter", param)
+	}
+
+	val, err := strconv.Atoi(str)
+	if err != nil {
+		return 0, fmt.Errorf("invalid %s parameter: %v", param, err)
+	}
+
+	return val, nil
 }

@@ -66,6 +66,7 @@ type OrderStore interface {
 	CreateOrder(Order) (int, error)
 	CreateOrderItem(OrderItem) error
 }
+
 type CreateProductPayload struct {
 	Name        string  `json:"name" validate:"required"`
 	Description string  `json:"description"`
@@ -88,4 +89,68 @@ type LoginUserPayload struct {
 
 type CartCheckoutPayload struct {
 	Items []CartCheckoutItem `json:"items" validate:"required"`
+}
+
+type Expense struct {
+	ID          int       `json:"id"`
+	Description string    `json:"description" validate:"required"`
+	Amount      float64   `json:"amount" validate:"required"`
+	PaidBy      int       `json:"paidBy" validate:"required"`
+	GroupID     int       `json:"groupId" validate:"required"`
+	CreatedAt   time.Time `json:"createdAt"`
+}
+
+type ExpenseSplit struct {
+	ID        int       `json:"id"`
+	ExpenseID int       `json:"expenseId" validate:"required"`
+	UserID    int       `json:"userId" validate:"required"`
+	Amount    float64   `json:"amount" validate:"required"`
+	Status    string    `json:"status" validate:"required,oneof=pending paid"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type Group struct {
+	ID          int       `json:"id"`
+	Name        string    `json:"name" validate:"required"`
+	Description string    `json:"description"`
+	CreatedBy   int       `json:"createdBy" validate:"required"`
+	CreatedAt   time.Time `json:"createdAt"`
+}
+
+type GroupMember struct {
+	ID        int       `json:"id"`
+	GroupID   int       `json:"groupId" validate:"required"`
+	UserID    int       `json:"userId" validate:"required"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type CreateExpensePayload struct {
+	Description string  `json:"description" validate:"required"`
+	Amount      float64 `json:"amount" validate:"required"`
+	GroupID     int     `json:"groupId" validate:"required"`
+	Splits      []struct {
+		UserID int     `json:"userId" validate:"required"`
+		Amount float64 `json:"amount" validate:"required"`
+	} `json:"splits" validate:"required"`
+}
+
+type CreateGroupPayload struct {
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description"`
+	Members     []int  `json:"members" validate:"required"`
+}
+
+type ExpenseStore interface {
+	CreateExpense(Expense) (int, error)
+	CreateExpenseSplit(ExpenseSplit) error
+	GetExpensesByGroup(groupID int) ([]Expense, error)
+	GetExpenseSplits(expenseID int) ([]ExpenseSplit, error)
+	UpdateExpenseSplitStatus(splitID int, status string) error
+}
+
+type GroupStore interface {
+	CreateGroup(Group) (int, error)
+	AddGroupMember(GroupMember) error
+	GetGroupByID(id int) (*Group, error)
+	GetGroupMembers(groupID int) ([]int, error)
 }

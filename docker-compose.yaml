@@ -3,7 +3,7 @@ version: "3.8"
 services:
   mysql:
     image: mysql:8
-    container_name: my_mysql
+    container_name: splitsense_mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -14,6 +14,34 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./backend/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "myuser", "-p", "mypassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    container_name: splitsense_backend
+    restart: always
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+      - DB_NAME=splitsense
+      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_EXPIRATION=86400
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
 
 volumes:
   mysql_data:
