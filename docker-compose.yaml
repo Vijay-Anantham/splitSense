@@ -15,11 +15,11 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./backend/migrations:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "myuser", "-p", "mypassword"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # healthcheck:
+    #   test: ["CMD", "mysqladmin", "ping", "-h", "mysql", "-u", "myuser", "-p", "mypassword"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
 
   backend:
     build:
@@ -37,9 +37,9 @@ services:
       - JWT_EXPIRATION=86400
     ports:
       - "8080:8080"
-    depends_on:
-      mysql:
-        condition: service_healthy
+    # depends_on:
+    #   mysql:
+    #     condition: service_healthy
     volumes:
       - ./backend:/app
 
